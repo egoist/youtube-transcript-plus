@@ -16,10 +16,12 @@ export async function defaultFetch({
   url,
   lang,
   userAgent,
+  fetch,
 }: {
   url: string;
   lang?: string;
   userAgent?: string;
+  fetch: typeof globalThis.fetch;
 }): Promise<Response> {
   return fetch(url, {
     headers: {

@@ -9,6 +9,7 @@ export interface TranscriptConfig {
   cache?: CacheStrategy;
   cacheTTL?: number;
   disableHttps?: boolean;
+  fetch?: typeof globalThis.fetch;
   videoFetch?: (params: { url: string; lang?: string; userAgent?: string }) => Promise<Response>;
   transcriptFetch?: (params: {
     url: string;

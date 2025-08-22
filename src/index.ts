@@ -16,7 +16,11 @@ import { TranscriptConfig, TranscriptResponse, TranscriptSegment } from './types
  * - Honors `lang`, custom fetch hooks (`videoFetch`, `transcriptFetch`), and optional cache strategy.
  */
 export class YoutubeTranscript {
-  constructor(private config?: TranscriptConfig & { cacheTTL?: number }) {}
+  private fetch: typeof globalThis.fetch;
+
+  constructor(private config?: TranscriptConfig & { cacheTTL?: number }) {
+    this.fetch = config?.fetch ?? globalThis.fetch;
+  }
 
   async fetchTranscript(videoId: string): Promise<TranscriptResponse> {
     const identifier = retrieveVideoId(videoId);
@@ -50,7 +54,7 @@ export class YoutubeTranscript {
     const watchUrl = `${protocol}://www.youtube.com/watch?v=${identifier}`;
     const videoPageResponse = (this.config as any)?.videoFetch
       ? await (this.config as any).videoFetch({ url: watchUrl, lang, userAgent })
-      : await defaultFetch({ url: watchUrl, lang, userAgent });
+      : await defaultFetch({ url: watchUrl, lang, userAgent, fetch: this.fetch });
 
     if (!videoPageResponse.ok) {
       throw new YoutubeTranscriptVideoUnavailableError(identifier);
@@ -92,7 +96,7 @@ export class YoutubeTranscript {
 
     // Use global fetch for the POST. No public interface change.
     // Use configurable fetch for the POST to allow custom fetch logic.
-    const playerRes = await fetch(playerEndpoint, {
+    const playerRes = await this.fetch(playerEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -153,7 +157,7 @@ export class YoutubeTranscript {
     // 5) Fetch transcript XML using the same hook surface as before
     const transcriptResponse = (this.config as any)?.transcriptFetch
       ? await (this.config as any).transcriptFetch({ url: transcriptURL, lang, userAgent })
-      : await defaultFetch({ url: transcriptURL, lang, userAgent });
+      : await defaultFetch({ url: transcriptURL, lang, userAgent, fetch: this.fetch });
 
     if (!transcriptResponse.ok) {
       // Preserve legacy behavior
