@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { FsCache } from '../../cache/fs-cache';
 import fs from 'fs/promises';
 import path from 'path';

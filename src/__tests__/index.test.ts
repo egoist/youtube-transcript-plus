@@ -1,3 +1,4 @@
+import { describe, it, expect, vi } from 'vitest';
 import { YoutubeTranscript } from '../index';
 import {
   YoutubeTranscriptInvalidVideoIdError,
@@ -42,7 +43,7 @@ describe('YoutubeTranscript', () => {
   });
 
   it('should construct URLs with HTTP when disableHttps is true', async () => {
-    const mockFetch = jest.fn().mockResolvedValue({
+    const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
       text: () =>
         Promise.resolve(
@@ -66,7 +67,7 @@ describe('YoutubeTranscript', () => {
     );
 
     // Restore the original fetch
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 });
 
@@ -112,7 +113,7 @@ describe('YoutubeTranscript Error Handling', () => {
     const transcriptFetcher = new YoutubeTranscript();
     const videoId = 'dQw4w9WgXcQ';
     // Mock a response that indicates too many requests
-    jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
       ok: true,
       text: () => Promise.resolve('<div class="g-recaptcha"></div>'),
     } as Response);
@@ -126,7 +127,7 @@ describe('YoutubeTranscript Error Handling', () => {
     const transcriptFetcher = new YoutubeTranscript();
     const videoId = 'dQw4w9WgXcQ';
     // Mock a response that indicates no transcript is available
-    jest.spyOn(global, 'fetch').mockResolvedValueOnce({
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
       ok: true,
       status: 404,
       text: () =>

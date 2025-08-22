@@ -202,4 +202,7 @@ export { InMemoryCache, FsCache } from './cache';
 export * from './errors';
 
 // Export the static method directly for convenience
-export const fetchTranscript = YoutubeTranscript.fetchTranscript;
+export const fetchTranscript: (
+  videoId: string,
+  config?: TranscriptConfig,
+) => Promise<TranscriptResponse[]> = YoutubeTranscript.fetchTranscript;

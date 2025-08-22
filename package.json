@@ -1,17 +1,17 @@
 {
-  "name": "youtube-transcript-plus",
+  "name": "@egoist/youtube-transcript-plus",
   "version": "1.1.0",
   "description": "Fetch transcript from a YouTube video",
   "type": "module",
-  "main": "dist/youtube-transcript-plus.js",
-  "module": "dist/youtube-transcript-plus.js",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "packageManager": "bun@1.0.0",
   "scripts": {
-    "build": "rollup -c",
+    "build": "tsdown",
     "format": "prettier --write 'src/**/*.ts'",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "prepare": "husky"
+    "test": "vitest --no-watch",
+    "test:watch": "vitest"
   },
   "author": "ericmmartin",
   "keywords": [
@@ -19,28 +19,14 @@
     "transcript"
   ],
   "license": "MIT",
-  "lint-staged": {
-    "src/**/*.ts": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{js,json,md}": [
-      "prettier --write"
-    ]
-  },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
+    "@types/node": "^20.0.0",
     "https-proxy-agent": "^7.0.6",
-    "husky": "^9.1.7",
-    "jest": "^30.0.5",
-    "lint-staged": "^16.1.5",
     "prettier": "^3.6.2",
-    "rollup": "^4.46.4",
-    "rollup-plugin-typescript": "^1.0.1",
-    "rollup-plugin-typescript2": "^0.36.0",
-    "ts-jest": "^29.4.1",
+    "tsdown": "^0.7.2",
     "tslib": "^2.8.1",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vitest": "^2.0.5"
   },
   "files": [
     "dist/*"
