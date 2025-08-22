@@ -17,9 +17,13 @@ export interface TranscriptConfig {
   }) => Promise<Response>;
 }
 
-export interface TranscriptResponse {
+export interface TranscriptSegment {
   text: string;
   duration: number;
   offset: number;
   lang?: string;
 }
+export type TranscriptResponse = {
+  title: string;
+  segments: TranscriptSegment[];
+};

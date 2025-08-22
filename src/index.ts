@@ -7,7 +7,7 @@ import {
   YoutubeTranscriptNotAvailableError,
   YoutubeTranscriptNotAvailableLanguageError,
 } from './errors';
-import { TranscriptConfig, TranscriptResponse } from './types';
+import { TranscriptConfig, TranscriptResponse, TranscriptSegment } from './types';
 
 /**
  * Implementation notes:
@@ -18,7 +18,7 @@ import { TranscriptConfig, TranscriptResponse } from './types';
 export class YoutubeTranscript {
   constructor(private config?: TranscriptConfig & { cacheTTL?: number }) {}
 
-  async fetchTranscript(videoId: string): Promise<TranscriptResponse[]> {
+  async fetchTranscript(videoId: string): Promise<TranscriptResponse> {
     const identifier = retrieveVideoId(videoId);
 
     const lang = this.config?.lang;
@@ -37,7 +37,7 @@ export class YoutubeTranscript {
       const cached = await cache.get(cacheKey);
       if (cached) {
         try {
-          return JSON.parse(cached) as TranscriptResponse[];
+          return JSON.parse(cached) as TranscriptResponse;
         } catch {
           // ignore parse errors and continue
         }
@@ -62,6 +62,9 @@ export class YoutubeTranscript {
     if (videoPageBody.includes('class="g-recaptcha"')) {
       throw new YoutubeTranscriptTooManyRequestError();
     }
+
+    const titleMatch = videoPageBody.match(/<title>(.*?)<\/title>/);
+    const title = titleMatch ? titleMatch[1] : '';
 
     // 2) Extract Innertube API key from the page
     const apiKeyMatch =
@@ -164,33 +167,33 @@ export class YoutubeTranscript {
 
     // 6) Parse XML into the existing TranscriptResponse shape
     const results = [...transcriptBody.matchAll(RE_XML_TRANSCRIPT)];
-    const transcript: TranscriptResponse[] = results.map((m) => ({
+    const segments: TranscriptSegment[] = results.map((m) => ({
       text: m[3],
       duration: parseFloat(m[2]),
       offset: parseFloat(m[1]),
       lang: lang ?? selectedTrack.languageCode,
     }));
 
-    if (transcript.length === 0) {
+    if (segments.length === 0) {
       throw new YoutubeTranscriptNotAvailableError(identifier);
     }
 
     // Cache store
     if (cache) {
       try {
-        await cache.set(cacheKey, JSON.stringify(transcript), cacheTTL);
+        await cache.set(cacheKey, JSON.stringify({ title, segments }), cacheTTL);
       } catch {
         // non-fatal
       }
     }
 
-    return transcript;
+    return { title, segments };
   }
 
   static async fetchTranscript(
     videoId: string,
     config?: TranscriptConfig,
-  ): Promise<TranscriptResponse[]> {
+  ): Promise<TranscriptResponse> {
     const instance = new YoutubeTranscript(config as any);
     return instance.fetchTranscript(videoId);
   }
@@ -205,4 +208,6 @@ export * from './errors';
 export const fetchTranscript: (
   videoId: string,
   config?: TranscriptConfig,
-) => Promise<TranscriptResponse[]> = YoutubeTranscript.fetchTranscript;
+) => Promise<TranscriptResponse> = YoutubeTranscript.fetchTranscript;
+
+export type { TranscriptConfig, TranscriptResponse, TranscriptSegment } from './types';

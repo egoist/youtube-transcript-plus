@@ -15,7 +15,7 @@ describe('YoutubeTranscript', () => {
     const videoId = 'dQw4w9WgXcQ';
     const transcript = await transcriptFetcher.fetchTranscript(videoId);
     expect(transcript).toBeDefined();
-    expect(transcript.length).toBeGreaterThan(0);
+    expect(transcript.segments.length).toBeGreaterThan(0);
   });
 
   it('should throw YoutubeTranscriptInvalidVideoIdError when video is invalid', async () => {
