@@ -11,7 +11,8 @@
     "build": "tsdown",
     "format": "prettier --write 'src/**/*.ts'",
     "test": "vitest --no-watch",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "bun run build"
   },
   "author": "ericmmartin",
   "keywords": [
